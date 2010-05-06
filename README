@@ -1,0 +1,11 @@
+TODO: 
+ - High Speed e.g.
+    $('#speed').calc(delta,[$('#distance'),$('#time')]);
+ - jQuery Chaining e.g. 
+    $('a').calc('b').hide();
+ - Tests, find out a good way too test
+ - Code re-organisation, make more logical and modular, jslint
+ - Operate on all element types not just inputs
+ - Multiple objects become an array of values
+   ${.manyElementsWithValues} => [12,13,11,10]
+ - Renaissance Stonecutter Scotch Ale (ongoing effort)
