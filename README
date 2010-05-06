@@ -21,7 +21,7 @@ DONE:
 		
 TODO:
  - Code re-organisation, make more logical and modular, jslint @ongoing
- - Tests, find out a good way too test
+ - Tests, and find out a good way to test
  - Operate on all element types not just inputs @upcoming
  - Multiple objects become an array of values 
 		${.manyElementsWithValues} => [12,13,11,10] @upcoming
