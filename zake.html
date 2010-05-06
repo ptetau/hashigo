@@ -10,11 +10,10 @@
 
 				$('#email').calc('(${#firstname} + ${#lastname}).length > 0 ? ${#firstname} + "." + ${#lastname}.replace(" ","") +"@zake.com" : ""');
 
-				//$('#emailReq').calc('(${#firstname} + ${#lastname}).length>0 ? "" : "Please enter first AND last names"',{triggerOnLoad:false});
 				$('#emailReq').calc(function(firstname,lastname){
 					return	(firstname + lastname).length > 0 ? "" : "Please enter first AND last names";
 				},
-					[$('#firstname'),$('#lastname')]
+					[$('#firstname'),$('#lastname')],{triggerOnLoad:false}
 				);
 			});
 		</script>
