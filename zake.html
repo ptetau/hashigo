@@ -6,12 +6,16 @@
 		<script type="text/javascript" src="jquery.hashigo.js"></script>
 		<script type="text/javascript">
 			$(function(){
-				//$('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
+				$('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
 
-				//$('#email').calc('(${#firstname} + ${#lastname}).length > 0 ? ${#firstname} + "." + ${#lastname}.replace(" ","") +"@zake.com" : ""');
+				$('#email').calc('(${#firstname} + ${#lastname}).length > 0 ? ${#firstname} + "." + ${#lastname}.replace(" ","") +"@zake.com" : ""');
 
 				//$('#emailReq').calc('(${#firstname} + ${#lastname}).length>0 ? "" : "Please enter first AND last names"',{triggerOnLoad:false});
-				$('#emailReq').calcHS(function(firstname,lastname){(firstname + lastname).length > 0 ? "" : "Please enter first AND last names"},[$('#firstname'),$('#lastname')]);
+				$('#emailReq').calc(function(firstname,lastname){
+					return	(firstname + lastname).length > 0 ? "" : "Please enter first AND last names";
+				},
+					[$('#firstname'),$('#lastname')]
+				);
 			});
 		</script>
 	</head>

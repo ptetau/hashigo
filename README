@@ -1,11 +1,28 @@
-TODO: 
+jQuery.hashigo.js by Patrick Te Tau
+
+Hashigo is spreadsheet style programming on the DOM.
+ - You program formulas which are written in javascript.
+ - Formulas can reference elements via their selectors e.g. ${#mySelector}
+ - The result populates the target DOM element
+ - The result RECALCULATES with every change (keyup event) to a referenced element
+
+Usage:
+	$target.calc(formulaString[, options]);
+		e.g. $('#a').calc('${#b} + ${#c}');
+
+   	$target.calc(function[, $variableElements, options]);
+		e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
+
+DONE: 
  - High Speed e.g.
-    $('#speed').calc(delta,[$('#distance'),$('#time')]);
+	    $('#speed').calc(delta,[$('#distance'),$('#time')]); @done
  - jQuery Chaining e.g. 
-    $('a').calc('b').hide();
+		$('a').calc('b').hide(); @done
+		
+TODO:
+ - Code re-organisation, make more logical and modular, jslint @ongoing
  - Tests, find out a good way too test
- - Code re-organisation, make more logical and modular, jslint
- - Operate on all element types not just inputs
- - Multiple objects become an array of values
-   ${.manyElementsWithValues} => [12,13,11,10]
- - Renaissance Stonecutter Scotch Ale (ongoing effort)
+ - Operate on all element types not just inputs @upcoming
+ - Multiple objects become an array of values 
+		${.manyElementsWithValues} => [12,13,11,10] @upcoming
+ - Renaissance Stonecutter Scotch Ale @ongoing
