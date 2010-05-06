@@ -21,7 +21,7 @@ jQuery.fn.calc = function() {
     var funktion = null;
 
     //the formula if there is one
-    var formuka = null;
+    var formula = null;
 
     //determine what type of calculation we have
     if (_(arguments[0]).isString()) {
@@ -65,8 +65,8 @@ jQuery.fn.calc = function() {
 
             //Assign event handlers on variable elements
             _.each($variableElements, function($variableElement) {
-                $variableElement.bind(settings.event, fw)
-                });
+                $variableElement.bind(settings.event, fw);
+            });
 
             break;
 
@@ -91,12 +91,12 @@ jQuery.fn.calc = function() {
     });
 
     return jQuery(this);
-}
+};
 
 jQuery.fn.calc.settings = {
     event: 'keyup',
     triggerOnLoad: true
-}
+};
 
 jQuery.fn.calc.FormulaTool = (function() {
     function getInputValue($element) {
@@ -151,13 +151,13 @@ jQuery.fn.calc.FormulaTool = (function() {
             $element.val(content);
         } else {
             $element.text(content);
-        };
+        }
     }
 
     function formulaWrapper($element, formula) {
         return function() {
             setContent($element, unescape(resolveAndEvalFormula(formula)));
-        }
+        };
     }
 
     function functionWrapper($element, funktion, $variableElements) {
@@ -170,7 +170,7 @@ jQuery.fn.calc.FormulaTool = (function() {
 
             //Apply these values as arguments on the supplied funktion    
             setContent($element, unescape(funktion.apply(this, values)));
-        }
+        };
     }
 
     return {
@@ -179,5 +179,5 @@ jQuery.fn.calc.FormulaTool = (function() {
         getResolvedFormula: getResolvedFormula,
         formulaWrapper: formulaWrapper,
         functionWrapper: functionWrapper
-    }
+    };
 })();

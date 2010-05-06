@@ -10,7 +10,7 @@ Usage:
 	$target.calc(formulaString[, options]);
 		e.g. $('#a').calc('${#b} + ${#c}');
 
-   	$target.calc(function[, $variableElements, options]);
+	$target.calc(function[, $variableElements, options]);
 		e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
 
 DONE: 
