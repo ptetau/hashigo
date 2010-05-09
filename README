@@ -1,28 +1,54 @@
 jQuery.hashigo.js by Patrick Te Tau
 
 Hashigo is spreadsheet style programming on the DOM.
- - You program formulas which are written in javascript.
- - Formulas can reference elements via their selectors e.g. ${#mySelector}
+ - You program formulas which are JavaScript with simple tokens for resolving
+   DOM elements, e.g. 
+   		alert(${.IAmASelector}[0]);
+   
+ - Tokens resolve to elements via their selectors e.g. ${#mySelector}
  - The result populates the target DOM element
- - The result RECALCULATES with every change (keyup event) to a referenced element
+ - The result RECALCULATES with every change (a 'keyup' event) to the 
+   referenced element
 
 Usage:
 	$target.calc(formulaString[, options]);
-		e.g. $('#a').calc('${#b} + ${#c}');
+		e.g. $('#a').calc('${#b}[0] + ${#c}[0]');
 
 	$target.calc(function[, $variableElements, options]);
 		e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
 
-DONE: 
+Completed: 
  - High Speed e.g.
 	    $('#speed').calc(delta,[$('#distance'),$('#time')]); @done
+	    
  - jQuery Chaining e.g. 
-		$('a').calc('b').hide(); @done
+		$('#result').calc('${#a}[0] + ${#b}[0]').hide(); @done
+		
+ - Multiple objects become an array of values 
+		${.manyElementsWithValues} => [12,13,11,10] @done
+		
+ - Operate on all element types not just inputs @done
 		
 TODO:
+ - Add an intuitive short hand for arrays (...) inside formulas i.e.
+ 		Given a DOM like the following:
+	 		<a>1</a> <a>2</a> <a>7</a>
+		A selector ${a...} resolves to [1,2,7] 
+		Without (...) the selector resolves to the very first item 
+			e.g. ${a} => 1
+			
+ - Evaluate selectors beginning in '#' or ending in ':eq(n)' as single values
+   and not arrays with a single element, e.g.
+   		Given a DOM like the following:
+   			<span id='an'>example</span>
+   		${#an} resolves to ['example']
+		And a DOM like the following:
+   			<a>so</a><a>many</a><a>anchors</a>
+   		${a:eq(2)} resolves to 'anchors'
+   		
+ - Add support for multiple events at fired at once, e.g.
+ 		{events : ['blur', 'change', 'keyup']}
+ 		
  - Code re-organisation, make more logical and modular, jslint @ongoing
- - Tests, and find out a good way to test
- - Operate on all element types not just inputs @upcoming
- - Multiple objects become an array of values 
-		${.manyElementsWithValues} => [12,13,11,10] @upcoming
+ - Tests, and find out a good way to test, e.g. fireunit
  - Renaissance Stonecutter Scotch Ale @ongoing

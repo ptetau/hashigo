@@ -1,18 +1,19 @@
-jQuery.fn.calc = function() {
-
+jQuery.fn.calc = function(functionOrFormula,elementArrayOrOptions,optionsOrUndefined) {
+		
     //calc seamlessly handles evaluated formulas or functions 
-    //with $valiableElements. It needs to know which though.
+    //with $valiableElements. The arguments will be of different
+    //types depending on invocation
+
     var CalcTypes = {
-        FORMULA: 'formula',
-        //Formulas are eval'd
-        FUNCTION: 'function'
+        FORMULA: 'formula', // Arguments = 	calc(formula[,options])
+        FUNCTION: 'function'// 				calc(function[,values[], options])
     };
 
     //formula or function
     var type = '';
 
     //for use with functions
-    var $variableElements = [];
+    var elementsArr = [];
 
     //user defined functions
     var options = {};
@@ -24,50 +25,52 @@ jQuery.fn.calc = function() {
     var formula = null;
 
     //determine what type of calculation we have
-    if (_(arguments[0]).isString()) {
+    if (_(functionOrFormula).isString()) {
 
         //formulas are strings
         type = CalcTypes.FORMULA;
-        formula = arguments[0];
+        formula = functionOrFormula;
 
         //use options if provided
-        options = !!arguments[1] ? arguments[1] : options;
+        options = !!functionOrFormula ? elementArrayOrOptions : options;
 
-    } else if (_(arguments[0]).isFunction()) {
+    } else if (_(functionOrFormula).isFunction()) {
 
         type = CalcTypes.FUNCTION;
-        funktion = arguments[0];
+        funktion = functionOrFormula;
 
-        if (_(arguments[1]).isArray()) {
+        if (_(elementArrayOrOptions).isArray()) {
 
-            //function has $variableElements
-            $variableElements = arguments[1];
+            //function has elementsArray
+            elementsArr = elementArrayOrOptions;
 
             //use options if provided
-            options = !!arguments[2] ? arguments[2] : options;
+            options = !!optionsOrUndefined ? optionsOrUndefined : options;
         }
     }
 
-    //a shortcut to our formula tools
+    //functionOrFormula shortcut to our formula tools
     var FT = jQuery.fn.calc.FormulaTool;
 
-    var settings = jQuery.extend(jQuery.fn.calc.settings, options);
+    var settings = jQuery.extend({},jQuery.fn.calc.Settings, options);
 
-    jQuery(this).each(function() {
-        var $element = jQuery(this);
+	var $this = jQuery(this);
+    
+    $this.each(function() {
+        var $element = $this;
 
         var fw = null;
 
         switch (type) {
         case CalcTypes.FUNCTION:
-
-            fw = FT.functionWrapper($element, funktion, $variableElements);
+        		
+            fw = FT.functionWrapper($element, funktion, elementsArr);
 
             //Assign event handlers on variable elements
-            _.each($variableElements, function($variableElement) {
-                $variableElement.bind(settings.event, fw);
+            _.each(elementsArr, function($element) {
+                $element.bind(settings.event, fw);
             });
-
+			
             break;
 
         case CalcTypes.FORMULA:
@@ -83,60 +86,78 @@ jQuery.fn.calc = function() {
 
         default:
             //Do nothing
-            }
+            break;
+        }
 
         if (settings.triggerOnLoad) {
             fw();
         }
     });
-
-    return jQuery(this);
+	
+    return $this;
 };
 
-jQuery.fn.calc.settings = {
+jQuery.fn.calc.Settings = {
     event: 'keyup',
     triggerOnLoad: true
 };
 
 jQuery.fn.calc.FormulaTool = (function() {
-    function getInputValue($element) {
-
-        if ($element.is('input')) {
-            var val = $element.val();
-            return escape(val);
-        }
-
-        var $closestInput = $element.find('input');
-
-        if ($closestInput.length === 0) {
-            throw 'DOM Element (id : ' + $element.attr('id') + ', classes : ' + $element.attr('class') + ') is not or does contain a valid input';
-        }
-
-        return getInputValue($closestInput);
+    function resolve(elements) {
+    	
+		var values = _(elements).map(function(element){
+			var $element = $(element)
+			
+			var value = null;
+			
+		    if ($element.is('input') || $element.is('select')) {
+		    	//inputs and selects have values, not text 
+		        return $element.val();
+		    }else{
+				return $element.text();
+			}
+		});
+		
+		return values;
     }
-
-    function getResolvedFormula(formula) {
+    
+    function replaceSelectors(formula) {
         var selectors = getSelectors(formula);
 
         if (selectors.length === 0) {
             return formula;
         }
 
-        var outputFormula = formula;
-
         _(selectors).each(function(selector) {
-            outputFormula = resolveSelectorAsValue(outputFormula, selector);
+            formula = replaceSelector(formula, selector);
         });
 
-        return outputFormula;
+        return formula;
     }
 
-    function resolveSelectorAsValue(formula, selector) {
-        return formula.replace('${' + selector + '}', '"' + getInputValue(jQuery(selector)) + '"');
+    function replaceSelector(formula, selector) {
+		var values = _(resolve(jQuery(selector))).map(function(value){
+			if (value.match(/^[0-9]+$/)){
+				//String is functionOrFormula number.
+				//convert strings 
+				//containing only numbers
+				//to floats
+				return parseFloat(value);
+			}else{
+				//Escaping any user entered strings 
+				//as they could be interpreted as code
+				//and break the function
+				return '"' + escape(value) + '"';
+			}
+		});
+		
+		//wrap array inside '[]' brackets
+		//so that they can evaluated as an array
+        return formula.replace('${' + selector + '}', '[' + values + ']');
     }
 
     function resolveAndEvalFormula(formula) {
-        var js = getResolvedFormula(formula);
+        var js = replaceSelectors(formula);
         return eval(js);
     }
 
@@ -147,6 +168,7 @@ jQuery.fn.calc.FormulaTool = (function() {
     }
 
     function setContent($element, content) {
+    
         if ($element.is('input')) {
             $element.val(content);
         } else {
@@ -160,14 +182,14 @@ jQuery.fn.calc.FormulaTool = (function() {
         };
     }
 
-    function functionWrapper($element, funktion, $variableElements) {
+    function functionWrapper($element, funktion, elementsArr) {
+   
         return function() {
-
             //Map the array of elements to their corresponding values
-            var values = _($variableElements).map(function($element) {
-                return getInputValue($element);
+            var values = elementsArr.map(function($element) {
+                return resolve($element);
             });
-
+            
             //Apply these values as arguments on the supplied funktion    
             setContent($element, unescape(funktion.apply(this, values)));
         };
@@ -176,8 +198,10 @@ jQuery.fn.calc.FormulaTool = (function() {
     return {
         getSelectors: getSelectors,
         resolveAndEvalFormula: resolveAndEvalFormula,
-        getResolvedFormula: getResolvedFormula,
+        replaceSelectors: replaceSelectors,
+        resolve: resolve,
         formulaWrapper: formulaWrapper,
-        functionWrapper: functionWrapper
+        functionWrapper: functionWrapper,
+        replaceSelector: replaceSelector
     };
 })();

@@ -6,19 +6,40 @@
 		<script type="text/javascript" src="jquery.hashigo.js"></script>
 		<script type="text/javascript">
 			$(function(){
-				$('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
+				$('#h').calc('Math.sqrt(Math.pow(${#a}[0],2) + Math.pow(${#o}[0],2));');
 
-				$('#email').calc('(${#firstname} + ${#lastname}).length > 0 ? ${#firstname} + "." + ${#lastname}.replace(" ","") +"@zake.com" : ""');
-
+				$('#email').calc('(${#firstname}[0] + ${#lastname}[0]).length > 0 ? ${#firstname}[0] + "." + ${#lastname}[0].replace(" ","") +"@zake.com" : ""');
+				
 				$('#emailReq').calc(function(firstname,lastname){
 					return	(firstname + lastname).length > 0 ? "" : "Please enter first AND last names";
 				},
 					[$('#firstname'),$('#lastname')],{triggerOnLoad:false}
 				);
+				
+				$('#result').calc(function(tds){
+					return _(tds).reduce(0,function(memo, value){
+						return memo + parseFloat(value);
+					});
+				},[$('td')]);
 			});
 		</script>
 	</head>
 	<body>
+		<h1>Table sum</h1>
+		<table>
+			<tr>
+				<td>12</td>
+			</tr>
+			<tr>
+				<td>15</td>
+			</tr>
+			<tr>
+				<td>16</td>
+			</tr>
+		</table>
+				
+		<span id="result"></span>
+		
 		<h1>Hypotenuse calulator</h1>
 		adjacent = <input type="text" id="a" />
 		<br/>
