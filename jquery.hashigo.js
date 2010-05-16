@@ -229,16 +229,17 @@ jQuery.fn.calc.FormulaTool = (function() {
     }
     
     function tests(){
-    	var FT = jQuery.fn.calc.FormulaTool;
     	
-    	fireunit.ok( FT.isPluralSelector('#singular') === false, "IDs are singular" );
-    	fireunit.ok( FT.isPluralSelector('#not, #singular') === true, "two IDs together are plural" );
-     	fireunit.ok( FT.isPluralSelector('#totally #singular') === false, "only the final ID counts" );
- 	    fireunit.ok( FT.isPluralSelector('plural') === true, "tag selectors are plural" );
- 	    fireunit.ok( FT.isPluralSelector('this is #singular') === false, "tag selectors are plural" );
- 	    fireunit.ok( FT.isPluralSelector('.this is singular:last') === false, "':last' filter coerces singularity" );
- 	    fireunit.ok( FT.isPluralSelector('.this is singular:first') === false, "':first' filter coerces singularity" );
-        fireunit.ok( FT.isPluralSelector('.this is singular:eq(0)') === false, "'eq()' filter coerces singularity" );
+    	fireunit.ok( isPluralSelector('#not, #singular') === true, "',' is always plural" );
+ 	    fireunit.ok( isPluralSelector('td') === true, "ends with a tag" );
+ 	    fireunit.ok( isPluralSelector('#this #is #not singular') === true, "ends with a tag" );
+     	fireunit.ok( isPluralSelector('#totally #singular') === false, "ends with an ID" );
+     	fireunit.ok( isPluralSelector('#singular') === false, "ends with an ID" );
+ 	    fireunit.ok( isPluralSelector('this is #singular') === false, "ends with an ID" );
+ 	    fireunit.ok( isPluralSelector('this is #singular') === false, "ends with an ID" );
+ 	    fireunit.ok( isPluralSelector('.this is singular:last') === false, "':last' returns a single element" );
+ 	    fireunit.ok( isPluralSelector('.this is singular:first') === false, "':first' returns a single element" );
+        fireunit.ok( isPluralSelector('.this is singular:eq(0)') === false, "'eq()' returns a single element" );
  	    
     	fireunit.testDone();
     }
