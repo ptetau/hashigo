@@ -67,7 +67,8 @@ jQuery.fn.calc = function(functionOrFormula,elementArrayOrOptions,optionsOrUndef
             fw = FT.functionWrapper($element, funktion, elementsArr);
 
             //Assign event handlers on variable elements
-            _.each(elementsArr, function($element) {
+            //but only assign each handler once!
+			_(elementsArr).chain().uniq().each(function($element) {
                 $element.bind(settings.event, fw);
             });
 			
@@ -136,8 +137,9 @@ jQuery.fn.calc.FormulaTool = (function() {
     }
 
     function replaceSelector(formula, selector) {
+    
 		var values = _(resolve(jQuery(selector))).map(function(value){
-			if (value.match(/^[0-9]+$/)){
+			if (/^[0-9]+$/.test(value)){
 				//String is functionOrFormula number.
 				//convert strings 
 				//containing only numbers
@@ -151,9 +153,14 @@ jQuery.fn.calc.FormulaTool = (function() {
 			}
 		});
 		
-		//wrap array inside '[]' brackets
-		//so that they can evaluated as an array
-        return formula.replace('${' + selector + '}', '[' + values + ']');
+    	if(isPluralSelector(selector)){
+			//wrap array inside '[]' brackets
+			//so that they can evaluated as an array
+		    return formula.replace('${' + selector + '}', '[' + values + ']');
+	    }else{
+	    	//no wrapping
+	    	return formula.replace('${' + selector + '}', values[0]);
+	    }
     }
 
     function resolveAndEvalFormula(formula) {
@@ -162,9 +169,35 @@ jQuery.fn.calc.FormulaTool = (function() {
     }
 
     function getSelectors(formula) {
-        return _(formula.match(/\$\{(.*?)\}/g)).map(function(sigil) {
+        return _(formula.match(/\$\{.*?\}/g)).map(function(sigil) {
             return sigil.match(/\$\{(.*?)\}/)[1];
         });
+    }
+    
+    function isPluralSelector(selector){
+    	//Selectors that could return more than
+    	//one elements are plural selectors e.g. class selectors
+    	//Conversly selectors that return individual
+    	//elements are singular selectors, e.g. id selectors
+    	
+    	if (selector.indexOf(",") > 0){
+    		//multiple selectors is certainly plural
+    		return true;
+    	}
+		
+		var filterPattern = new RegExp(/((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/)
+    	
+    	if (filterPattern.test(selector) === true){
+    		//A selector ending in #id will only return 
+    		//a singular element 
+    		//:first, :last, and eq(n) are filters that
+    		//only ever return one element, therefore
+    		//they are considered singular
+    		return false;
+    	}
+    	
+    	//any other case is currently handled as plural
+    	return true;
     }
 
     function setContent($element, content) {
@@ -194,6 +227,21 @@ jQuery.fn.calc.FormulaTool = (function() {
             setContent($element, unescape(funktion.apply(this, values)));
         };
     }
+    
+    function test(){
+    	var FT = jQuery.fn.calc.FormulaTool;
+    	
+    	fireunit.ok( FT.isPluralSelector('#singular') === false, "IDs are singular" );
+    	fireunit.ok( FT.isPluralSelector('#not, #singular') === true, "two IDs together are plural" );
+     	fireunit.ok( FT.isPluralSelector('#totally #singular') === false, "only the final ID counts" );
+ 	    fireunit.ok( FT.isPluralSelector('plural') === true, "tag selectors are plural" );
+ 	    fireunit.ok( FT.isPluralSelector('this is #singular') === false, "tag selectors are plural" );
+ 	    fireunit.ok( FT.isPluralSelector('.this is singular:last') === false, "':last' filter coerces singularity" );
+ 	    fireunit.ok( FT.isPluralSelector('.this is singular:first') === false, "':first' filter coerces singularity" );
+        fireunit.ok( FT.isPluralSelector('.this is singular:eq(0)') === false, "'eq()' filter coerces singularity" );
+ 	    
+    	fireunit.testDone();
+    }
 
     return {
         getSelectors: getSelectors,
@@ -202,6 +250,8 @@ jQuery.fn.calc.FormulaTool = (function() {
         resolve: resolve,
         formulaWrapper: formulaWrapper,
         functionWrapper: functionWrapper,
-        replaceSelector: replaceSelector
+        replaceSelector: replaceSelector,
+        isPluralSelector: isPluralSelector,
+        test: test
     };
 })();

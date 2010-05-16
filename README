@@ -11,11 +11,15 @@ Hashigo is spreadsheet style programming on the DOM.
    referenced element
 
 Usage:
-	$target.calc(formulaString[, options]);
-		e.g. $('#a').calc('${#b}[0] + ${#c}[0]');
-
-	$target.calc(function[, $variableElements, options]);
-		e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
+	Evaluate a formula at runtime! This method is tidy and slick.
+		$target.calc(formulaString[, options]);
+			e.g. $('#a').calc('${#b} + ${#c}');
+	
+	Specify a function as your formula and manually parse
+	your arguments. Ideal for computation involving lot's of elements!
+	
+		$target.calc(function[, $variableElements, options]);
+			e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
 
 Completed: 
  - High Speed e.g.
@@ -28,15 +32,7 @@ Completed:
 		${.manyElementsWithValues} => [12,13,11,10] @done
 		
  - Operate on all element types not just inputs @done
-		
-TODO:
- - Add an intuitive short hand for arrays (...) inside formulas i.e.
- 		Given a DOM like the following:
-	 		<a>1</a> <a>2</a> <a>7</a>
-		A selector ${a...} resolves to [1,2,7] 
-		Without (...) the selector resolves to the very first item 
-			e.g. ${a} => 1
-			
+ 
  - Evaluate selectors beginning in '#' or ending in ':eq(n)' as single values
    and not arrays with a single element, e.g.
    		Given a DOM like the following:
@@ -45,6 +41,24 @@ TODO:
 		And a DOM like the following:
    			<a>so</a><a>many</a><a>anchors</a>
    		${a:eq(2)} resolves to 'anchors'
+		
+TODO:
+ - Currently values are subsituted into formulas by replacing each occurance 
+   the resolved value, this continual replacement is not efficient. 
+   A 'zipping' method would be superior.
+   		e.g.
+			_(formulaParts)
+				.chain()
+				.zip(resolvedSelectors)
+				.value()
+				.join(''); 	
+ 
+ - Add an intuitive short hand for arrays (...) inside formulas i.e. @undecided
+ 		Given a DOM like the following:
+	 		<a>1</a> <a>2</a> <a>7</a>
+		A selector ${a...} resolves to [1,2,7] 
+		Without (...) the selector resolves to the very first item 
+			e.g. ${a} => 1
    		
  - Add support for multiple events at fired at once, e.g.
  		{events : ['blur', 'change', 'keyup']}
