@@ -228,7 +228,7 @@ jQuery.fn.calc.FormulaTool = (function() {
         };
     }
     
-    function test(){
+    function tests(){
     	var FT = jQuery.fn.calc.FormulaTool;
     	
     	fireunit.ok( FT.isPluralSelector('#singular') === false, "IDs are singular" );
@@ -245,13 +245,8 @@ jQuery.fn.calc.FormulaTool = (function() {
 
     return {
         getSelectors: getSelectors,
-        resolveAndEvalFormula: resolveAndEvalFormula,
-        replaceSelectors: replaceSelectors,
-        resolve: resolve,
         formulaWrapper: formulaWrapper,
         functionWrapper: functionWrapper,
-        replaceSelector: replaceSelector,
-        isPluralSelector: isPluralSelector,
-        test: test
+        tests: tests
     };
 })();
