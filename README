@@ -21,7 +21,9 @@ Usage:
 		$target.calc(function[, $variableElements, options]);
 			e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
 
-Completed: 
+Completed:
+ - Further renaming and oredering of methods 
+ - High speed formula resolution using Ian Edwards zipper method	
  - High Speed e.g.
 	    $('#speed').calc(delta,[$('#distance'),$('#time')]); @done
 	    
@@ -42,28 +44,12 @@ Completed:
    			<a>so</a><a>many</a><a>anchors</a>
    		${a:eq(2)} resolves to 'anchors'
 		
-TODO:
- - Currently values are subsituted into formulas by replacing each occurance 
-   the resolved value, this continual replacement is not efficient. 
-   A 'zipping' method would be superior.
-   		e.g.
-			_(formulaParts)
-				.chain()
-				.zip(resolvedSelectors)
-				.value()
-				.join(''); 	
+TODO:   		
+ - Support for custom event binding methods
  
- - Add an intuitive short hand for arrays (...) inside formulas i.e. @undecided
- 		Given a DOM like the following:
-	 		<a>1</a> <a>2</a> <a>7</a>
-		A selector ${a...} resolves to [1,2,7] 
-		Without (...) the selector resolves to the very first item 
-			e.g. ${a} => 1
-   		
  - Add support for multiple events at fired at once, e.g.
  		{events : ['blur', 'change', 'keyup']}
  		
+ - Complete test coverage with fireunit or similar	
  - Code re-organisation, make more logical and modular, jslint @ongoing
- - Tests, and find out a good way to test, e.g. fireunit
-   Test everything!
  - Renaissance Stonecutter Scotch Ale @ongoing

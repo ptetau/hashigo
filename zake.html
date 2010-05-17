@@ -7,7 +7,7 @@
 		<script type="text/javascript">
 			$(function(){
 			
-				$('#result').calc('_(${td}).reduce(0,function(memo, value){return memo + parseFloat(value);});');
+				$('.result').calc('_(${td}).reduce(0,function(memo, value){return memo + parseFloat(value);});');
 				
 				$('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
 
@@ -35,7 +35,7 @@
 			</tr>
 		</table>
 				
-		<span id="result"></span>
+		<span class="result"></span> 
 		
 		<h1>Hypotenuse calulator</h1>
 		adjacent = <input type="text" id="a" />
