@@ -1,29 +1,27 @@
 jQuery.hashigo.js by Patrick Te Tau
 
-Hashigo is spreadsheet style programming on the DOM.
- - You program formulas which are JavaScript with simple tokens for resolving
+Hashigo is spreadsheet style programming on the DOM. 
+Perfect for tasks like calculating values in a shopping basket, or writing validation.
+ - You program formulas which are JavaScript with selectors as values
    DOM elements, e.g. 
-   		alert(${.IAmASelector}[0]);
-   
- - Tokens resolve to elements via their selectors e.g. ${#mySelector}
- - The result populates the target DOM element
- - The result RECALCULATES with every change (a 'keyup' event) to the 
-   referenced element
+   		$('#total').calc('sum(${.items})');
+
+ - Selectors become values
+ - The result RECALCULATES with every change (a 'keyup' event), just like a spread sheet
 
 Usage:
 	Evaluate a formula at runtime! This method is tidy and slick.
-		$target.calc(formulaString[, options]);
-			e.g. $('#a').calc('${#b} + ${#c}');
+	$target.calc(formulaString[, options]);
+		e.g. $('#a').calc('${#b} + ${#c}');
 	
 	Specify a function as your formula and manually parse
-	your arguments. Ideal for computation involving lot's of elements!
-	
-		$target.calc(function[, $variableElements, options]);
+	your arguments. Ideal for computation involving lot's of elements
+	$target.calc(function[, $variableElements, options]);
 			e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
 
 Completed:
- - Further renaming and oredering of methods 
- - High speed formula resolution using Ian Edwards zipper method	
+ - Further renaming and ordering of methods 
+ - High speed formula resolution using Ian Edwards zipper method, previously O(n^2) now O(n)
  - High Speed e.g.
 	    $('#speed').calc(delta,[$('#distance'),$('#time')]); @done
 	    
