@@ -22,7 +22,9 @@ Usage:
 			e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
 
 Completed:
- - Further renaming and oredering of methods 
+ - Support for custom event binding methods
+  		
+ - Further renaming and ordering of methods 
  - High speed formula resolution using Ian Edwards zipper method	
  - High Speed e.g.
 	    $('#speed').calc(delta,[$('#distance'),$('#time')]); @done
@@ -44,12 +46,10 @@ Completed:
    			<a>so</a><a>many</a><a>anchors</a>
    		${a:eq(2)} resolves to 'anchors'
 		
-TODO:   		
- - Support for custom event binding methods
- 
+TODO:   		 		
  - Add support for multiple events at fired at once, e.g.
  		{events : ['blur', 'change', 'keyup']}
- 		
+
  - Complete test coverage with fireunit or similar	
  - Code re-organisation, make more logical and modular, jslint @ongoing
  - Renaissance Stonecutter Scotch Ale @ongoing

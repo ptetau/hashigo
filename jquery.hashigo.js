@@ -288,7 +288,6 @@ jQuery.fn.calc.FormulaTool = (function () {
         getSelectors: getSelectors,
         formulaWrapper: formulaWrapper,
         functionWrapper: functionWrapper,
-        tests: tests,
-        patterns: patterns
+        tests: tests
     };
 })();
