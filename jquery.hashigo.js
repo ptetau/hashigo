@@ -29,7 +29,7 @@ jQuery.fn.calc = function (functionOrFormula, elementArrayOrOptions, optionsOrUn
     var options = {};
 
     //the function if there is one
-    var funktion = null;
+    var fn = null;
 
     //the formula if there is one
     var formula = null;
@@ -47,7 +47,7 @@ jQuery.fn.calc = function (functionOrFormula, elementArrayOrOptions, optionsOrUn
     } else if (_(functionOrFormula).isFunction()) {
 
         type = CalcTypes.FUNCTION;
-        funktion = functionOrFormula;
+        fn = functionOrFormula;
 
         if (_(elementArrayOrOptions).isArray()) {
 
@@ -74,7 +74,7 @@ jQuery.fn.calc = function (functionOrFormula, elementArrayOrOptions, optionsOrUn
         switch (type) {
         case CalcTypes.FUNCTION:
 
-            fw = FT.functionWrapper($element, funktion, elementsArr);
+            fw = FT.functionWrapper($element, fn, elementsArr);
 
             //Assign event handlers on variable elements
             //but only assign each handler once!
@@ -90,8 +90,14 @@ jQuery.fn.calc = function (functionOrFormula, elementArrayOrOptions, optionsOrUn
 
             var selectors = FT.getSelectors(formula);
 
-            //Assign event handlers on variable elements
-            jQuery(selectors.join(',')).bind(settings.event, fw);
+			var $elements = jQuery(selectors.join(','));
+			if (settings.bindFn === null){
+            	//Assign event handlers on variable elements
+            	$elements.bind(settings.event, fw);
+            }else{
+            	//User has supplied their own bind function
+            	settings.bindFn($elements, fw);
+            }
 
             break;
 
@@ -110,12 +116,24 @@ jQuery.fn.calc = function (functionOrFormula, elementArrayOrOptions, optionsOrUn
 
 jQuery.fn.calc.Settings = {
     event: 'keyup',
-    triggerOnLoad: true
+    triggerOnLoad: true,
+    bindFn: null
 };
 
 jQuery.fn.calc.FormulaTool = (function () {
 
-    var selectorPattern = /\$\{.*?\}/g;
+	//Common patterns
+	var patterns = {};
+    patterns.selector = new RegExp(/\$\{.*?\}/g);
+    patterns.innerSelector = new RegExp(/\$\{(.*?)\}/);
+    patterns.singularSelector = new RegExp(/((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/);
+    patterns.number = new RegExp(/^[0-9]+$/);
+    
+    //Compile the patterns
+    _(patterns).chain().values().each(function (pattern) {
+    	new RegExp().compile(pattern);
+	});
+    
 
     function formulaWrapper($element, formula) {
         return function () {
@@ -123,7 +141,7 @@ jQuery.fn.calc.FormulaTool = (function () {
         };
     }
 
-    function functionWrapper($element, funktion, elementsArr) {
+    function functionWrapper($element, fn, elementsArr) {
 
         return function () {
             //Map the array of elements to their corresponding values
@@ -131,8 +149,8 @@ jQuery.fn.calc.FormulaTool = (function () {
                 return getContents($element);
             });
 
-            //Apply these values as arguments on the supplied funktion    
-            setContent($element, unescape(funktion.apply(this, values)));
+            //Apply these values as arguments on the supplied fn    
+            setContent($element, unescape(fn.apply(this, values)));
         };
     }
 
@@ -140,7 +158,7 @@ jQuery.fn.calc.FormulaTool = (function () {
         //split into selectors and parts of the formula
         //that lie between 
         var selectors = getSelectors(formula);
-        var parts = formula.split(selectorPattern);
+        var parts = formula.split(patterns.selector);
 
         //two pass selector resolution that avoids 
         //us having to resolve the same selector
@@ -177,7 +195,7 @@ jQuery.fn.calc.FormulaTool = (function () {
     function getContents($elements) {
 
         var values = _($elements).map(function (element) {
-            var $element = $(element);
+            var $element = jQuery(element);
 
             var value = null;
 
@@ -202,7 +220,7 @@ jQuery.fn.calc.FormulaTool = (function () {
     }
 
     function autoParse(value) {
-        if (/^[0-9]+$/.test(value)) {
+        if (patterns.number.test(value)) {
             //String is functionOrFormula number.
             //convert strings 
             //containing only numbers
@@ -222,11 +240,8 @@ jQuery.fn.calc.FormulaTool = (function () {
     }
 
     function getSelectors(formula) {
-
-        var innerSelectorPattern = /\$\{(.*?)\}/;
-
-        return _(formula.match(selectorPattern)).map(function (sigil) {
-            return sigil.match(innerSelectorPattern)[1];
+        return _(formula.match(patterns.selector)).map(function (sigil) {
+            return sigil.match(patterns.innerSelector)[1];
         });
     }
 
@@ -240,9 +255,7 @@ jQuery.fn.calc.FormulaTool = (function () {
             return true;
         }
 
-        var filterPattern = /((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/;
-
-        if (filterPattern.test(selector) === true) {
+        if (patterns.singularSelector.test(selector) === true) {
             //A selector ending in #id will only return 
             //a singular element 
             //:first, :last, and eq(n) are filters that
@@ -275,6 +288,7 @@ jQuery.fn.calc.FormulaTool = (function () {
         getSelectors: getSelectors,
         formulaWrapper: formulaWrapper,
         functionWrapper: functionWrapper,
-        tests: tests
+        tests: tests,
+        patterns: patterns
     };
 })();

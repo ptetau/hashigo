@@ -7,7 +7,9 @@
 		<script type="text/javascript">
 			$(function(){
 			
-				$('.result').calc('_(${td}).reduce(0,function(memo, value){return memo + parseFloat(value);});');
+				$('.result').calc('_(${td}).reduce(0,function(memo, value){return memo + parseFloat(value);});',
+					{bindFn: function($elements, fn){$elements.live('keyup', fn)}
+				});
 				
 				$('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
 
