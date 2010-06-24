@@ -18,7 +18,7 @@
 				$('#emailReq').calc(function(firstname,lastname){
 					return	(firstname + lastname).length > 0 ? "" : "Please enter first AND last names";
 				},
-					[$('#firstname'),$('#lastname')],{triggerOnLoad:false}
+					['#firstname','#lastname'],{triggerOnLoad:false}
 				);
 			});
 		</script>
@@ -52,5 +52,48 @@
 		Lastname: <input type="text" id="lastname" />
 		<br/>
 		Email: <span id="email"></span> <span id="emailReq" style="color:red"></span>
+		
+		<h1>Radios</h1>
+		<label><input type="radio" value=".5" name="multiplier">Half</input></label>
+		<label><input type="radio" value="2" name="multiplier">Double</input></label>
+		<br/>
+		<span id="selectedRadioTimes10"></span>
+		
+		<h1>Selects</h1>
+		<select name="aOrB">
+			<option value="a">a</option>
+			<option value="b">b</option>
+		</select>
+		<br/>
+		<span id="selectedOption"></span>
+		
+		<h1>Checks</h1>
+		<label><input type="checkbox" class="beer" name="stonecutter" value="7">Renaissance Stonecutter</input></label>
+		<label><input type="checkbox" class="beer" name="twisted" value="8">Twisted Hop</input></label>
+		<br/>
+		<span id="beerCost"></span>
+		
+		<script type="text/javascript">
+			$(function(){
+				$('#selectedRadioTimes10').calc("10 * ${input[name='multiplier']:checked}[0]",{
+					bindFn : function($elements,fn){
+						$elements.live('click',fn);	
+					}
+				});
+				
+				$('#selectedOption').calc("'Selected: ' + ${[name=aOrB] option:selected};",{
+					bindFn : function($elements,fn){
+						$elements.live('click',fn);	
+					}
+				});
+				
+				$('#beerCost').calc("'Beer bill: $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});",{
+					bindFn : function($elements,fn){
+						$elements.live('click',fn);	
+					}
+				});
+			});
+		</script>		
+
 	</body>
 </html>
