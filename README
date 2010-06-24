@@ -16,27 +16,20 @@ Usage:
 	
 	Specify a function as your formula and manually parse
 	your arguments. Ideal for computation involving lot's of elements
-	$target.calc(function[, $variableElements, options]);
-			e.g. $('#a').calc(function(b,c),[$('#b'),$('#c')]);
+	$target.calc(function[, selectorArray, options]);
+			e.g. $('#a').calc(function(b,c),['#b','#c']);
 
 Completed:
- - Support for custom event binding methods
-  		
+ - Support for custom event binding methods  		
  - Further renaming and ordering of methods 
- 
  - High speed formula resolution using Ian Edwards zipper method, previously O(n^2) now O(n)
-
  - High Speed e.g.
-	    $('#speed').calc(delta,[$('#distance'),$('#time')]); @done
-	    
+	    $('#speed').calc(delta,['#distance','#time']); @done
  - jQuery Chaining e.g. 
 		$('#result').calc('${#a}[0] + ${#b}[0]').hide(); @done
-		
  - Multiple objects become an array of values 
 		${.manyElementsWithValues} => [12,13,11,10] @done
-		
  - Operate on all element types not just inputs @done
- 
  - Evaluate selectors beginning in '#' or ending in ':eq(n)' as single values
    and not arrays with a single element, e.g.
    		Given a DOM like the following:
@@ -48,8 +41,7 @@ Completed:
 		
 TODO:   		 		
  - Add support for multiple events at fired at once, e.g.
- 		{events : ['blur', 'change', 'keyup']}
-
+ 		{events : 'blur change keyup'}
  - Complete test coverage with fireunit or similar	
  - Code re-organisation, make more logical and modular, jslint @ongoing
  - Renaissance Stonecutter Scotch Ale @ongoing

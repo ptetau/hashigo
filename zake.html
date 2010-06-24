@@ -75,23 +75,11 @@
 		
 		<script type="text/javascript">
 			$(function(){
-				$('#selectedRadioTimes10').calc("10 * ${input[name='multiplier']:checked}[0]",{
-					bindFn : function($elements,fn){
-						$elements.live('click',fn);	
-					}
-				});
+				$('#selectedRadioTimes10').calc("10 * ${input[name='multiplier']:checked}[0]");
 				
-				$('#selectedOption').calc("'Selected: ' + ${[name=aOrB] option:selected};",{
-					bindFn : function($elements,fn){
-						$elements.live('click',fn);	
-					}
-				});
+				$('#selectedOption').calc("${[name=aOrB] option:not(:selected)};'Selected: ' + ${[name=aOrB] option:selected};");
 				
-				$('#beerCost').calc("'Beer bill: $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});",{
-					bindFn : function($elements,fn){
-						$elements.live('click',fn);	
-					}
-				});
+				$('#beerCost').calc("${.beer:not(:checked)};'Beer bill: $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});");
 			});
 		</script>		
 

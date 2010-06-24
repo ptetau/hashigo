@@ -80,7 +80,7 @@ jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndef
                 var $elements = jQuery(selector);
                 if (settings.bindFn === null){
                     //Assign event handlers on variable elements
-                    $elements.bind(settings.event, fw);
+                    $elements.live(settings.event, fw);
                 }else{
                     //User has supplied their own bind function
                     settings.bindFn($elements, fw);
