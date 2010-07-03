@@ -8,13 +8,14 @@
  * Licensed under the MIT license.
  *
  */
- 
-jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndefined) {    
+
+jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndefined) {
     //calc seamlessly handles evaluated formulas or functions 
     //with $valiableElements. The arguments will be of different
     //types depending on invocation
     var CalcTypes = {
-        FORMULA: 'formula',  // calc(formula[,options])
+        FORMULA: 'formula',
+        // calc(formula[,options])
         FUNCTION: 'function' // calc(function[,values[], options])
     };
 
@@ -49,15 +50,15 @@ jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndef
         fn = functionOrFormula;
 
         if (_(selectorsOrOptions).isArray()) {
-					
+
             //function has selectors
             selectors = selectorsOrOptions;
 
             //use options if provided
             options = !! optionsOrUndefined ? optionsOrUndefined : options;
         }
-    }    
-	
+    }
+
     //functionOrFormula shortcut to our formula tools
     var FT = jQuery.fn.calc.FormulaTool;
 
@@ -65,65 +66,72 @@ jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndef
 
     var $this = jQuery(this);
 
-    $this.each(function (){        
+    $this.each(function () {
         var $element = jQuery(this);
         var fw = null;
 
         switch (type) {
         case CalcTypes.FUNCTION:
 
-            fw = FT.functionWrapper($element, fn, selectors);
-
-            //Assign event handlers on variable elements
-            //but only assign each handler once!
-            _(selectors).chain().uniq().each(function (selector) {                
-                var $elements = jQuery(selector);
-                if (settings.bindFn === null){
-                    //Assign event handlers on variable elements
-                    $elements.live(settings.event, fw);
-                }else{
-                    //User has supplied their own bind function
-                    settings.bindFn($elements, fw);
-                }
-            });
-
+            functionBinding($element, fn, settings, selectors);
             break;
 
         case CalcTypes.FORMULA:
-            
-            //Wrapped the following in a closure because 
-            //selectors is already defined and means something
-            //slightly different in this scope.
-            //I will rewrite this so that 'functions 'and 'formulas'
-            //are disptched outside the switch.
-            (function(){
-                fw = FT.formulaWrapper($element, formula);
-    
-                var selectors = FT.getSelectors(formula);            
-    			var $elements = jQuery(selectors.join(','));
-                
-    			if (settings.bindFn === null){
-                	//Assign event handlers on variable elements
-                	$elements.live(settings.event, fw);
-                }else{
-                	//User has supplied their own bind function
-                	settings.bindFn($elements, fw);
-                }
-            })();
+
+            formulaBinding($element, formula, settings);
             break;
 
         default:
             //Do nothing
             break;
         }
+    });
+
+    function formulaBinding($element, formula, settings) {
+
+        fw = jQuery.fn.calc.FormulaTool.formulaWrapper($element, formula);
+
+        var selectors = jQuery.fn.calc.FormulaTool.getSelectors(formula);
+        var $elements = jQuery(selectors.join(','));
+
+        if (settings.bindFn === null) {
+            //Assign event handlers on variable elements
+            $elements.live(settings.event, fw);
+        } else {
+            //User has supplied their own bind function
+            settings.bindFn($elements, fw);
+        }
 
         if (settings.triggerOnLoad) {
             fw();
         }
-    });
+    }
+
+    function functionBinding($element, fn, settings, selectors) {
+
+        fw = jQuery.fn.calc.FormulaTool.functionWrapper($element, fn, selectors);
+
+        //Assign event handlers on variable elements
+        //but only assign each handler once!
+        _(selectors).chain().uniq().each(function (selector) {
+            var $elements = jQuery(selector);
+            if (settings.bindFn === null) {
+                //Assign event handlers on variable elements
+                $elements.live(settings.event, fw);
+            } else {
+                //User has supplied their own bind function
+                settings.bindFn($elements, fw);
+            }
+        });
+
+        if (settings.triggerOnLoad) {
+            fw();
+        }
+    }
 
     return $this;
 };
+
 
 jQuery.fn.calc.Settings = {
     event: 'keyup change foucusout',
@@ -133,18 +141,18 @@ jQuery.fn.calc.Settings = {
 
 jQuery.fn.calc.FormulaTool = (function () {
 
-	//Common patterns
-	var patterns = {};
-    patterns.selector = new RegExp(/\$\{.*?\}/g);
-    patterns.innerSelector = new RegExp(/\$\{(.*?)\}/);
-    patterns.singularSelector = new RegExp(/((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/);
-    patterns.number = new RegExp(/^[0-9]+$/);
-    
+    //Common patterns
+    var patterns = {
+        selector: new RegExp(/\$\{.*?\}/g),
+        innerSelector: new RegExp(/\$\{(.*?)\}/),
+        singularSelector: new RegExp(/((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/),
+        number: new RegExp(/^[0-9]+$/)
+    };
+
     //Compile the patterns
     _(patterns).each(function (pattern) {
-    	new RegExp().compile(pattern);
-	});
-    
+        new RegExp().compile(pattern);
+    });
 
     function formulaWrapper($element, formula) {
         return function () {
@@ -156,10 +164,10 @@ jQuery.fn.calc.FormulaTool = (function () {
         return function () {
             //Map the array of elements to their corresponding values
             var values = _(selectorArr).map(function (selector) {
-                return getContents(jQuery(selector));
+                return resolveSelector(selector);
             });
 
-            //Apply these values as arguments on the supplied fn    
+            //Apply these values as arguments on the supplied fn     
             setContent($element, unescape(fn.apply(this, values)));
         };
     }
@@ -176,7 +184,7 @@ jQuery.fn.calc.FormulaTool = (function () {
         //map selectors to their resolved values
         var selectorsToValues = {};
         _(selectors).chain().uniq().map(function (selector) {
-            selectorsToValues[selector] = resolveSelector(selector);
+            selectorsToValues[selector] = wrapValue(_(resolveSelector(selector)).map(autoParse));
         });
 
         //resolve every selector
@@ -190,15 +198,21 @@ jQuery.fn.calc.FormulaTool = (function () {
 
     function resolveSelector(selector) {
 
-        var resolvedSelector = _(getContents(jQuery(selector))).map(autoParse);
+        var resolvedSelector = getContents(jQuery(selector));
 
         if (isPluralSelector(selector)) {
-            //wrap array inside '[]' brackets
-            //so that they can evaluated as an array
-            return '[' + resolvedSelector + ']';
+            return resolvedSelector;
         } else {
-            //no wrapping
             return resolvedSelector[0];
+        }
+    }
+
+    function wrapValue(val) {
+
+        if (_(val).isArray()) {
+            return '[' + val + ']';
+        } else {
+            return val;
         }
     }
 
@@ -246,6 +260,7 @@ jQuery.fn.calc.FormulaTool = (function () {
 
     function evalFormula(formula) {
         var js = resolveSelectors(formula);
+
         return eval(js);
     }
 
