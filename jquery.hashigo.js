@@ -145,8 +145,7 @@ jQuery.fn.calc.FormulaTool = (function () {
     var patterns = {
         selector: new RegExp(/\$\{.*?\}/g),
         innerSelector: new RegExp(/\$\{(.*?)\}/),
-        singularSelector: new RegExp(/((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/),
-        number: new RegExp(/^[0-9]+$/)
+        singularSelector: new RegExp(/((\:last)|(\:first)|(\:eq\([0-9]+\))|(\#[a-z][a-z0-9]*))$/)
     };
 
     //Compile the patterns
@@ -184,7 +183,7 @@ jQuery.fn.calc.FormulaTool = (function () {
         //map selectors to their resolved values
         var selectorsToValues = {};
         _(selectors).chain().uniq().map(function (selector) {
-            selectorsToValues[selector] = wrapValue(_(resolveSelector(selector)).map(autoParse));
+            selectorsToValues[selector] = wrapValue(_(resolveSelector(selector)).map(escapeValue));
         });
 
         //resolve every selector
@@ -207,12 +206,12 @@ jQuery.fn.calc.FormulaTool = (function () {
         }
     }
 
-    function wrapValue(val) {
+    function wrapValue(value) {
 
-        if (_(val).isArray()) {
-            return '[' + val + ']';
+        if (_(value).isArray()) {
+            return '[' + value + ']';
         } else {
-            return val;
+            return value;
         }
     }
 
@@ -243,19 +242,11 @@ jQuery.fn.calc.FormulaTool = (function () {
         }
     }
 
-    function autoParse(value) {
-        if (patterns.number.test(value)) {
-            //String is functionOrFormula number.
-            //convert strings 
-            //containing only numbers
-            //to floats
-            return parseFloat(value);
-        } else {
+    function escapeValue(value) {
             //Escaping any user entered strings 
             //as they could be interpreted as code
             //and break the function
             return '"' + escape(value) + '"';
-        }
     }
 
     function evalFormula(formula) {
