@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="generator" content=
+    "HTML Tidy for Linux/x86 (vers 11 February 2007), see www.w3.org" />
+    <title>
+      Hashigo Zake test
+    </title>
+    <script type="text/javascript" src="jquery-1.4.2.js">
+</script>
+    <script type="text/javascript" src="underscore.js">
+</script>
+    <script type="text/javascript" src="jquery.hashigo.js">
+</script>
+    <script type="text/javascript">
+//<![CDATA[
+                    $(function(){
+                        
+                                $('#result').calc('_(${#sum td:not(#result)}).reduce(0,function(memo, value){return memo + parseFloat(value);});');
+                                
+                                $('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
+
+                                $('#username').calc(function(firstname,lastname){
+                                        return (firstname.substr(0,1) + lastname).replace(/ /g,"").toLowerCase();
+                                },['#firstname','#lastname']);    
+                                
+                                $('#selectedRadioTimes10').calc("10 * ${input[name='multiplier']:checked}[0]");
+                                
+                                $('#selectedOption').calc("${[name=whatBeer]};'Selected : ' + ${[name=whatBeer] option:selected};");
+                                
+                                $('#beerCost').calc("${.beer};'Beer bill : $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});");
+                                
+                        });
+    //]]>
+    </script>
+    <style type="text/css">
+		/*<![CDATA[*/
+		body
+		{
+			background:none repeat scroll 0 0 #77CFE2;
+			color:#000;
+			font-family:"Palatino Linotype","Book Antiqua",Palatino,FreeSerif,serif;
+			font-size:16px;
+			line-height:24px;
+		}
+
+		h1,h2,h3
+		{
+			color:#CB3434;
+		}
+
+		code,pre
+		{
+			color:#0000D6;
+			font-size:26px;
+			font-weight:400;
+		}
+
+		p
+		{
+			margin-bottom:5px;
+			width:550px;
+		}
+
+		a,a:visited
+		{
+			background:none repeat scroll 0 0 #D3E29F;
+			color:#CB3434;
+			text-decoration:none;
+			padding:0 2px;
+		}
+
+		a:active,a:hover
+		{
+			background:none repeat scroll 0 0 #D8BC36;
+			color:#CB3434;
+		}
+
+		div.container
+		{
+			width:720px;
+			margin:50px 0 50px 50px;
+		}
+
+		#documentation p
+		{
+			margin-bottom:4px;
+		}
+
+		h1,h2,h3,h4,h5,h6
+		{
+			margin-top:40px;
+		}
+
+		b.header
+		{
+			font-size:18px;
+		}
+
+		span.alias
+		{
+			font-size:14px;
+			font-style:italic;
+			margin-left:20px;
+		}
+
+		table,tr,td
+		{
+			margin:0;
+			padding:0;
+		}
+
+		td
+		{
+			padding:2px 12px 2px 0;
+		}
+
+		code,pre,tt
+		{
+			font-family:Monaco,Consolas,"Lucida Console",monospace;
+			font-size:13px;
+			line-height:18px;
+		}
+
+		code
+		{
+			margin-left:20px;
+		}
+
+		pre
+		{
+			border-left:2px dotted #FFF;
+			margin:5px 0 20px;
+			padding:2px 0 2px 12px;
+		}
+
+		td#result
+		{
+			border-top:1px solid;
+		}
+
+		#sum
+		{
+			margin-left:48px;
+		}
+
+		span.hypotenuse,span.name
+		{
+			display:inline-block;
+			min-width:90px;
+		}
+    	/*]]>*/
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>
+        Hashigo.js
+      </h1>
+      <p>
+        Hashigo is spreadsheet style programming on the DOM.<br />
+        Perfect for tasks like calculating totals for a shopping cart, or writing
+        validation.
+      </p>
+      <p>
+        Hashigo has a wonderful shorthand that takes a selector and returns the value in
+        the HTML element it selects. Functions that use this shorthand must be evaluated
+        and are referred to as 'formulas'.<br />
+        <em>Example :</em> <code>$('#a').calc('${#b} + ${#c}');</code>
+      </p>
+      <p>
+        The examples below show you how hashigo can simplify your code.<br />
+        <em>Note: these examples use the excellent <a href='http://jquery.com'>jQuery</a>
+        and <a href='http://documentcloud.github.com/underscore/'>Underscore.js</a>
+        libraries.</em>
+      </p>
+      <h2>
+        Table sum
+      </h2>
+      <p>
+        Let's sum the values in this table and put the<br />
+        result in the cell with the ID 'result'.
+      </p>
+      <table id="sum">
+        <tr>
+          <td>
+            12
+          </td>
+        </tr>
+        <tr>
+          <td>
+            15
+          </td>
+        </tr>
+        <tr>
+          <td>
+            16 +
+          </td>
+        </tr>
+        <tr>
+          <td id="result">
+            16
+          </td>
+        </tr>
+      </table>
+      <p>
+        Without Hashigo :
+      </p>
+      <pre>
+//Select our table elements with jQuery
+var $cells = $('#sum td:not(#result)');
+
+//Map our table cells to their values
+var values = $cells.map(function(i,element){return $(element).text();});
+
+//Reduce our values to a single value 'sum'
+var sumOfValues = _(values).reduce(0,function(memo,val){return memo + parseFloat(val);});
+
+//Set our result
+$('#result').text(sumOfValues);
+</pre>
+      <p>
+        With some Hashigo :
+      </p>
+      <pre>
+$('#result').calc('_(${#sum td:not(#result)}).reduce(0,function(memo, value){' +
+        'return memo + parseFloat(value);' +
+'});');
+</pre>
+      <h2>
+        A hypotenuse calulator
+      </h2>
+      <p>
+        Every right angle triangle has a hypotenuse. A hypotenuse is the longest side on
+        any right angled triangle.
+      </p>
+      <p>
+        Here is a simple calculator you can use to calculate the hypotenuse of a right
+        angled triangle:
+      </p>
+      <p>
+        <span class='hypotenuse'>adjacent =</span> <input type="text" id="a" /><br />
+        <span class='hypotenuse'>opposite =</span> <input type="text" id="o" /><br />
+        <span class='hypotenuse'>hypotenuse = <em>sqrt(a^2 + o^2)</em>
+        =&nbsp;</span><input type="text" id="h" />
+      </p>
+      <p>
+        Ye olde way:
+      </p>
+      <pre>
+$('#a,#o,#h').bind('keyup',function(){
+        var a = $('#a').val(),
+            o = $('#o').val();
+                
+        $('#h').val(Math.sqrt(Math.pow(a,2) + Math.pow(o,2)));
+});
+</pre>
+      <p>
+        With some Hashigo :
+      </p>
+      <pre>
+$('#h').calc('Math.sqrt(Math.pow(${#a},2) + Math.pow(${#o},2));');
+</pre>
+      <h2>
+        Username generator
+      </h2>
+      <p>
+        Let's help our unimaginative users come up with a username for
+        our&nbsp;website.<br />
+        We'll generate a username with their first initial and their last name,
+        lowercased and without spaces.
+      </p>
+      <p>
+        <span class="name">First name :</span> <input type="text" id="firstname" /><br />
+        <span class="name">Last name :</span> <input type="text" id="lastname" /><br />
+        <span class="name">User name :</span> <input type="text" id="username" />
+      </p>
+      <p>
+        Old school method:
+      </p>
+      <pre>
+$('#firstname,#lastname').bind('keyup change',function(){
+        var username = $('#firstname').val().substr(0,1) + $('#lastname').val().replace(/ /g,"").toLowerCase();
+        $('#username').val(username);
+});
+</pre>
+      <p>
+        With help from Hashigo :
+      </p>
+      <pre>
+//Hashigo escapes all user input before it operates on it. 
+//Note this for when your formulas manipulate text.
+$('#username').calc('(${#firstname}.substr(0,1) + ${#lastname}).replace(/'+escape(' ')+'/g,"")').toLowerCase();
+</pre>
+      <p>
+        With help from Hashigo <em>Function mode</em>
+      </p>
+      <pre>
+//Hashigo can take functions too.
+//Useful for long calculations(enhances readibility). It's also faster.
+$('#username').calc(function(firstname,lastname){
+        return (firstname.substr(0,1) + lastname).replace(/ /g,"").toLowerCase();
+},['#firstname','#lastname']);
+</pre>
+      <h1>
+        Miscellaneous examples
+      </h1>
+      <p>
+        Other input types and how you might interact with them using Hashigo.
+      </p>
+      <h2>
+        Select lists/Drop downs
+      </h2><select name="whatBeer">
+        <option value="Renaissance">
+          Renaissance
+        </option>
+        <option value="8 Wired">
+          8 Wired
+        </option>
+      </select><br />
+      <span id="selectedOption"></span>
+      <pre>
+$('#selectedOption').calc("${[name=whatBeer]};'Selected : ' + ${[name=whatBeer] option:selected};");
+</pre>
+      <h2>
+        Check boxes
+      </h2><label><input type="checkbox" class="beer" name="stonecutter" value=
+      "7" />Renaissance Stonecutter</label> <label><input type="checkbox" class="beer"
+      name="twisted" value="8" />Twisted Hop IPA</label><br />
+      <span id="beerCost"></span>
+      <pre>
+$('#beerCost').calc("${.beer};'Beer bill : $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});");
+</pre>
+      <h2>
+        Radio buttons
+      </h2><label><input type="radio" value=".5" name="multiplier" />Half</label>
+      <label><input type="radio" value="2" name="multiplier" />Double</label><br />
+      <span id="selectedRadioTimes10"></span>
+      <pre>
+$('#selectedRadioTimes10').calc("10 * ${input[name='multiplier']:checked}[0]");
+</pre>
+    </div>
+  </body>
+</html>
