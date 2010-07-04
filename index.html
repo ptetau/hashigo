@@ -29,7 +29,7 @@
                                 
                                 $('#selectedOption').calc("${[name=whatBeer]};'Selected : ' + ${[name=whatBeer] option:selected};");
                                 
-                                $('#beerCost').calc("${.beer};'Beer bill : $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});");
+                                $('#beerCost').calc("${.beer};'Beer bill : $' + _(${.beer:checked}).reduce(0, function(memo,value){return memo + parseFloat(value);});");
                                 
                         });
     //]]>
@@ -322,7 +322,7 @@ $('#selectedOption').calc("${[name=whatBeer]};'Selected : ' + ${[name=whatBeer] 
       name="twisted" value="8" />Twisted Hop IPA</label><br />
       <span id="beerCost"></span>
       <pre>
-$('#beerCost').calc("${.beer};'Beer bill : $' + _(${.beer:checked}).reduce(0, function(memo,num){return memo + num;});");
+$('#beerCost').calc("${.beer};'Beer bill : $' + _(${.beer:checked}).reduce(0, function(memo,value){return memo + parseFloat(value);});");
 </pre>
       <h2>
         Radio buttons
