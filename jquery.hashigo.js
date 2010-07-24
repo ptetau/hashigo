@@ -94,13 +94,8 @@ jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndef
         var selectors = jQuery.fn.calc.FormulaTool.getSelectors(formula);
         var $elements = jQuery(selectors.join(','));
 
-        if (settings.bindFn === null) {
-            //Assign event handlers on variable elements
-            $elements.live(settings.event, fw);
-        } else {
-            //User has supplied their own bind function
-            settings.bindFn($elements, fw);
-        }
+        //User has supplied their own bind function
+        settings.bindFn($elements, fw);        
 
         if (settings.triggerOnLoad) {
             fw();
@@ -114,14 +109,9 @@ jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndef
         //Assign event handlers on variable elements
         //but only assign each handler once!
         _(selectors).chain().uniq().each(function (selector) {
-            var $elements = jQuery(selector);
-            if (settings.bindFn === null) {
-                //Assign event handlers on variable elements
-                $elements.live(settings.event, fw);
-            } else {
-                //User has supplied their own bind function
-                settings.bindFn($elements, fw);
-            }
+            var $elements = jQuery(selector);            
+            //User has supplied their own bind function
+            settings.bindFn($elements, fw);
         });
 
         if (settings.triggerOnLoad) {
@@ -134,9 +124,12 @@ jQuery.fn.calc = function (functionOrFormula, selectorsOrOptions, optionsOrUndef
 
 
 jQuery.fn.calc.Settings = {
-    event: 'keyup change foucusout',
+    event: 'change',
     triggerOnLoad: true,
-    bindFn: null
+    bindFn: function($elements,fw){
+        //Assign event handlers on variable elements
+        $elements.live(this.event, fw);
+    }
 };
 
 jQuery.fn.calc.FormulaTool = (function () {
